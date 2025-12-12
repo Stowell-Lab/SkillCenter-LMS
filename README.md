@@ -218,7 +218,7 @@ All flows/apps reference these CRs—no personal connections should remain in Pr
 * Required lists & libraries are created (see SharePoint Provisioning).
 
 **Steps:**
-1.  Locate the solution zip file (e.g., `SkillsCenterLMS_unmanaged_vX.Y.Z.zip`) included in this package.
+1.  Locate the solution zip file included in this package. [Download v1.0.0 Release](https://github.com/Stowell-Lab/SkillCenter-LMS/releases/tag/v1.0.0)
 2.  Go to **make.powerapps.com** → **Solutions** → **Import**.
 3.  Select the solution zip file.
 4.  On **Connections**, sign in / select existing until you see green checks.
