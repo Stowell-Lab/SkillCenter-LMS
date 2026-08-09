@@ -132,115 +132,28 @@ These two sources must be maintained manually and kept synchronized. A mismatch 
 | **MMT** | Module Methods Task, the submitted work product used to demonstrate mastery of a module. The application still uses this term even though current module configuration is stored in `Modules`. |
 
 ## Architecture
-
-- **Power Apps canvas apps**
-  - Student App
-  - Proctor/Grader App
-- **Power Automate flows**
-  - Student data retrieval
-  - Grading and feedback
-  - Student summary recalculation
-  - Submission archiving
-  - Certificate generation
-  - Enrollment synchronization
-  - Milestone calculations
-  - Automatic `StudentSummary` backup to XLSX
-- **SharePoint**
-  - A student facing site for student accessible SOPs, templates, and examples
-  - A restricted backend site for configuration, grades, submissions, keys, and protected resources
-- **Excel Online**
-  - A protected enrollment workbook with a table named `Enrollments`
-  - An automatically generated or refreshed XLSX backup of `StudentSummary`
-- **Office 365 Users**
-  - Supplies the signed in user's Microsoft 365 profile information used by the app header and identity-related features
-- **Environment variables and connection references**
-  - Bind the packaged apps and flows to the adopting institution's sites, lists, libraries, files, and Microsoft 365 connections
-
-## Security and Student Data Access
-
-The backend SharePoint site contains protected student and grading data and must be restricted to authorized course staff and the service account.
-
-Students do **not** receive direct access to the backend SharePoint site. Instead:
-
-1. A student opens the shared Power Apps canvas app while signed in with their institutional Microsoft account.
-2. The app derives the student's identity from the signed in account.
-3. A Power Automate flow runs through the service account.
-4. The flow matches the signed in identity to the institution's enrollment data.
-5. The service account retrieves only the matching student's data and returns it to the app.
-
-> **Security requirement:** Do not redesign the flow to trust a student entered ID by itself. Any requested student record must be matched to the authenticated user's identity before data is returned.
-
-Before production use, the adopting institution should review the app sharing model, flow run only permissions, service account connections, data returned by each flow, audit requirements, and applicable student record policies. The service account should have only the permissions required by the solution and should not be a personal staff account.
-
-The Proctor App and its administrative screens expose records for multiple students. Restrict the app through Power Apps sharing, SharePoint permissions, and application level role checks such as `ProctorEmails`.
-
-### Public documentation and screenshots
-
-Do not publish screenshots containing real student or staff information. Before adding screenshots to a public repository, replace or obscure names, email addresses, user IDs, student IDs, job titles, departments, course enrollment, submissions, feedback, and grades. Use fictional test accounts and fictional submissions for documentation.
-
-## Required and Legacy Components
-
-| Component | Status | Deployment guidance |
-| --- | --- | --- |
-| `Modules` | Required | Current list of available modules. |
-| `Grades` | Required | Stores submission and grading records. |
-| `StudentSummary` | Required | Stores one current summary row per student. |
-| `Admin` | Required | Stores course dates, milestones, proctor emails, and app version. |
-| `ModuleLinks` | Required when module relationships are used | Stores directed relationships between modules. |
-| `TemplateList` | Required | Stores reusable proctor feedback text. |
-| `MMTList` | Legacy import dependency | Create an empty custom list if the importer prompts for it. Do not use it for current modules. |
-| Student Records library | Required | Stores submissions, archive snapshots, and related metadata. |
-| Certifications library | Required for certificate generation | Stores the certificate template and generated PDFs. |
-| Microsoft Forms connection | Legacy | Forms is not used by the current workflow. The import may request permission for the legacy connector; grant consent if prompted, but no Forms data source needs to be selected. |
-| Office 365 Users connection | Required | Provides signed in user profile information used by the apps. |
-| StudentSummary XLSX backup | Required when the backup feature is used | Automatically copies data from the SharePoint `StudentSummary` list into an XLSX backup. |
+* **Canvas Apps:** Student App, Proctor/Grader App
+* **Flows:** Grading, archive + certificate generation, student summary recalculation, enrollment sync, milestone logic, etc.
+* **SharePoint:** Lists for configuration and data; libraries for files.
+* **Environment Variables:** Site URLs, list/library names, document paths.
+* **Connection References:** SharePoint, Teams, Forms, OneDrive, Excel.
 
 ## Prerequisites
+* **Licensing:** Microsoft 365 Licensing (e.g., Office 365 E3) covering Power Apps and Power Automate use rights.
+* **Power Platform:** Environment access (Dev/Test/Prod).
+* **SharePoint:** Site Owner on the target Grader-Only site (e.g., *Skills Center – Proctors*).
+    > **Critical:** This site must be restricted to Proctors/Staff. Students should not be members of this site.
 
-### Administrative access
-
-- Permission to import solutions into the target Power Platform environment, normally Environment Maker or Environment Admin.
-- Site Owner access to the restricted backend SharePoint site.
-- Permission to create SharePoint lists, libraries, columns, and site groups.
-- Permission to create or use the required Microsoft 365 connections.
-- Authority to configure and maintain the service account.
-
-### Licensing
-
-The adopting institution must confirm that its Microsoft 365 and Power Platform licenses cover every app user, flow owner, connector, and target environment. The original deployment used Microsoft 365 licensing such as Office 365 E3, but entitlements vary by tenant and connector configuration.
-
-### Accounts
-
-Use a managed service account for production connections. Do not leave production apps or flows dependent on the original developer's or an individual instructor's personal connections.
-
-### Environments
-
-Use separate Development, Test, and Production environments when available. At minimum, complete the smoke tests in a non-production environment before releasing the apps to students.
-
-## Recommended Deployment Order
-
-1. Create or select the Power Platform target environment.
-2. Create the managed service account and required Microsoft 365 connections.
-3. Create the student facing and restricted backend SharePoint sites.
-4. Create all required SharePoint lists and libraries, including the empty legacy `MMTList`.
-5. Create `ActiveStudents.xlsx`, format its enrollment range as a table named `Enrollments`, and place it at the configured path.
-6. Upload `Certificate.docx` to the configured Certifications path.
-7. Import the Solution ZIP.
-8. Bind all environment variables and connection references.
-9. Turn on and verify flows.
-10. Open, validate, save, publish, and share both Power Apps canvas apps.
-11. Verify permissions and run the smoke tests.
+---
 
 ## SharePoint Provisioning
 
-### Recommended two site model
+### Security Architecture: Two-Site Model
+To maintain academic integrity and data security, we use a two-site structure:
 
-1. **Student facing site:** Accessible to students. Stores student accessible SOP PDFs, MMT templates, MMT examples, app links, and general resources.
-2. **Backend site:** Restricted to proctors, graders, authorized administrators, and the service account. Stores lists, submissions, MMT keys, virtual lab links, podcasts, grading data, configuration, certificates, and protected workbooks.
-
-A Teams connected site or a private channel site can be used for the backend, but Teams is not required merely to create the SharePoint security boundary. Confirm the actual SharePoint site membership after creating a Team or channel; do not assume the channel configuration alone provides the intended permissions.
-
-> Students should not be members or visitors of the backend site and should not receive direct permissions to its lists or libraries.
+1.  **Parent Site (Student Facing):** A general site accessible to all students. This may house the link to the App, static SOPs, or general announcements.
+2.  **Grader Site (Backend):** The "target site" for the lists/libraries below. Access must be restricted to Proctors/Graders only.
+    * *Note: Students should never navigate directly to this site.*
 
 Create the following lists and libraries on the backend site. Display names can match the names below. Also verify the generated URL segment and internal column names before binding the solution.
 
@@ -525,63 +438,52 @@ The repository should provide generic copies of both template files. Until they 
 
 ## Environment Variables
 
-Environment variables bind the imported solution to the adopting institution's SharePoint locations and data sources. Names and options shown during import may vary slightly by solution version.
+### Lookup Configuration (Grades → StudentSummary)
+After creating **StudentSummary** and **Grades** lists:
+1.  In **Grades** → List settings → Create column, choose **Lookup**.
+2.  Name it `StudentID`.
+3.  Get information from: **StudentSummary**.
+4.  In this column: **ID**.
+5.  Add additional columns: check **Student Name** and **Class** (or your exact column display names).
+6.  Save.
+    * *Note: If you later rename fields in StudentSummary, re-open this lookup and re-select the additional fields.*
 
-### Scalar and path variables
+### Variable Table
+Set these during solution import (or after, in Solution → Environment Variables):
 
-| Environment variable | Example value | Purpose |
-| --- | --- | --- |
-| `CertificateFile` | `/Certifications/Certificate.docx` | Certificate Word template path. |
-| `CertificatePath` | `/Certifications` | Certifications library URL segment or configured path. |
-| `StudentRecordPath` | `/Student Records` | Student Records library path. Match the actual URL segment. |
-| `SyncTable` | `/Documents/ActiveStudents.xlsx` | Enrollment workbook containing the `Enrollments` table. |
+| EV Name | Example Value | Notes |
+| :--- | :--- | :--- |
+| **CertificateFile** | `/Certifications/Certificate.docx` | Template path inside the site. Place the certificate Word template here. |
+| **CertificatePath** | `/Certifications` | Library (URL segment) |
+| **StudentRecordPath** | `/Student Records` | Library (URL segment; match actual URL). Often `/Module Submissions`. |
+| **SyncTable** | `/Documents/ActiveStudents.xlsx` | Excel with table `Enrollments`. |
+| **Enrollments** | Site connection reference | Pick your Grader/Backend site connection (e.g., Skills Center – Proctors) |
+| **SkillsCenter** | Site connection reference | Site-level CR if used. |
+| **StudentSummary** | `StudentSummary` | List name bound via CR. |
+| **Grades** | `Grades` | List name bound via CR. |
+| **Modules** | `Modules` | List name bound via CR. |
+| **MMTList** | `MMTList` | If used. |
+| **ModuleLinks** | `ModuleLinks` | If used. |
+| **TemplateList** | `TemplateList` | If used. |
+| **Admin** | `Admin` | Settings list. |
+| **Certifications** | `Certifications` | Library name bound via CR. |
 
-### SharePoint data-source variables
+> **Important:** Verify the library/list URL in Library/List Settings → URL. Use that in EVs (spaces often appear as `%20`).
 
-| Environment variable | Bind to | Status |
-| --- | --- | --- |
-| `Enrollments` | Backend SharePoint site or enrollment datasource reference presented by the importer | Required |
-| `SkillsCenter` | Backend SharePoint site | Required when prompted |
-| `StudentSummary` | `StudentSummary` list | Required |
-| `Grades` | `Grades` list | Required |
-| `Modules` | `Modules` list | Required |
-| `ModuleLinks` | `ModuleLinks` list | Required when prompted |
-| `TemplateList` | `TemplateList` list | Required |
-| `Admin` | `Admin` list | Required |
-| `Certifications` | `Certifications` library | Required for certificates |
-| `MMTList` | Empty legacy `MMTList` | Legacy; bind if prompted |
+---
 
-To confirm a SharePoint list or library URL, open its settings and inspect the URL. Spaces may appear as `%20`. Use the value expected by the specific environment variable; do not assume that the display name and URL segment are identical.
+## Connection References
+Map these to connections in the target environment (prefer a service account):
 
-### Grades lookup configuration
+* **SharePoint** (site-level)
+* **Microsoft Teams**
+* **Microsoft Forms**
+* **Excel Online (Business)**
+* **OneDrive for Business**
 
-After creating `StudentSummary`, `Modules`, and `Grades`:
+All flows/apps reference these CRs—no personal connections should remain in Prod.
 
-1. Open **Grades** → **List settings**.
-2. Create or edit the `StudentID` lookup column.
-3. Set **Get information from** to `StudentSummary`.
-4. Set **In this column** to `ID`.
-5. Include the additional fields **Student Name** and **Class**.
-6. Create or verify the `ModuleID` lookup to `Modules` and include `ModuleHours` as an additional field.
-7. Save and confirm that SharePoint created the expected additional lookup columns.
-
-If an additional source column is renamed later, reopen the lookup configuration and reselect it. Display-name changes can also affect Power Apps formulas or flow actions, so retest the solution after any schema change.
-
-## Connections and Connection References
-
-Map packaged connection references to connections owned or authorized by the managed service account wherever backend access is required.
-
-Current or potentially required connections include:
-
-- SharePoint
-- Microsoft Teams
-- Excel Online (Business)
-- OneDrive for Business
-- Office 365 Users
-
-Microsoft Forms is a legacy connector. It is not used as a current data source. If import requests permission for the Forms connector, grant consent to complete the legacy binding; no form needs to be selected.
-
-After import, inspect every app and flow for broken connections and confirm that no production component retains a personal developer connection.
+---
 
 ## Importing the Solution
 
