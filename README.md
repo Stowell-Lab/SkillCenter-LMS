@@ -1,6 +1,6 @@
 # SkillsCenter LMS
 
-SkillsCenter LMS is a Power Apps and Power Automate solution for managing mastery-based work in higher-education laboratory courses. It tracks student enrollment, module submissions, grading, earned hours, feedback, milestones, and certificates.
+SkillsCenter LMS is a Power Apps and Power Automate solution for managing mastery based work in higher education laboratory courses. It tracks student enrollment, module submissions, grading, earned hours, feedback, milestones, and certificates.
 
 This repository is intended to help another institution:
 
@@ -10,7 +10,7 @@ This repository is intended to help another institution:
 
 The current release contains the installable Power Platform Solution ZIP. The certificate and enrollment templates referenced below must also be added to the repository or created by the adopting institution.
 
-> **Important:** This is a reference implementation, not a one-click deployment. SharePoint sites, lists, libraries, permissions, institutional enrollment data, and template files must be prepared before or during installation.
+> **Important:** This is a reference implementation, not a one click deployment. SharePoint sites, lists, libraries, permissions, institutional enrollment data, and template files must be prepared before or during installation.
 
 ## Contents
 
@@ -39,9 +39,9 @@ The current release contains the installable Power Platform Solution ZIP. The ce
 
 ## Intended Use
 
-The SkillsCenter LMS was developed for higher-education laboratory courses in which students complete modules, submit work, receive feedback from proctors or graders, and accumulate module hours or credit.
+The SkillsCenter LMS was developed for higher education laboratory courses in which students complete modules, submit work, receive feedback from proctors or graders, and accumulate module hours or credit.
 
-The solution can be customized, but adopters should first install and test the released configuration. Changes to SharePoint column names, data types, app formulas, flow actions, file paths, or identity-matching logic may require coordinated changes across multiple components.
+The solution can be customized, but adopters should first install and test the released configuration. Changes to SharePoint column names, data types, app formulas, flow actions, file paths, or identity matching logic may require coordinated changes across multiple components.
 
 This solution is not a replacement for an institution's official student information system or learning management system. It was created for customized education under the SkillsCenter framework. Institutional enrollment data must be exported or transformed into the workbook structure described in this guide and there is currently no support for automated syncing of students with other platforms.
 
@@ -71,7 +71,7 @@ The Proctor/Grader App allows authorized course staff to:
 - Assign or unassign themselves as grader.
 - Open the current DOCX and, when available, a prior submission.
 - Open the module SOP and restricted answer key.
-- Evaluate seven pass/not-pass rubric criteria.
+- Evaluate seven pass/ pass rubric criteria.
 - Insert reusable feedback from `TemplateList`.
 - Confirm a passing submission or reject it for revision.
 - View student progress, lab meeting completion, rollover hours, current modules, completed modules, and overrides.
@@ -141,15 +141,15 @@ These two sources must be maintained manually and kept synchronized. A mismatch 
 ## Prerequisites
 * **Licensing:** Microsoft 365 Licensing (e.g., Office 365 E3) covering Power Apps and Power Automate use rights.
 * **Power Platform:** Environment access (Dev/Test/Prod).
-* **SharePoint:** Site Owner on the target Grader-Only site (e.g., *Skills Center – Proctors*).
+* **SharePoint:** Site Owner on the target Grader Only site (e.g., *Skills Center – Proctors*).
     > **Critical:** This site must be restricted to Proctors/Staff. Students should not be members of this site.
 
 ---
 
 ## SharePoint Provisioning
 
-### Security Architecture: Two-Site Model
-To maintain academic integrity and data security, we use a two-site structure:
+### Security Architecture: Two Site Model
+To maintain academic integrity and data security, we use a two site structure:
 
 1.  **Parent Site (Student Facing):** A general site accessible to all students. This may house the link to the App, static SOPs, or general announcements.
 2.  **Grader Site (Backend):** The "target site" for the lists/libraries below. Access must be restricted to Proctors/Graders only.
@@ -191,7 +191,7 @@ Create the following lists and libraries on the backend site. Display names can 
 
 Create `StudentSummary` and `Modules` before creating the lookup columns in `Grades`.
 
-The seven score fields represent pass/not-pass rubric criteria:
+The seven score fields represent pass/not pass rubric criteria:
 
 | SharePoint field | Proctor App label |
 | --- | --- |
@@ -446,7 +446,7 @@ After creating **StudentSummary** and **Grades** lists:
 4.  In this column: **ID**.
 5.  Add additional columns: check **Student Name** and **Class** (or your exact column display names).
 6.  Save.
-    * *Note: If you later rename fields in StudentSummary, re-open this lookup and re-select the additional fields.*
+    * *Note: If you later rename fields in StudentSummary, reopen this lookup and reselect the additional fields.*
 
 ### Variable Table
 Set these during solution import (or after, in Solution → Environment Variables):
@@ -458,7 +458,7 @@ Set these during solution import (or after, in Solution → Environment Variable
 | **StudentRecordPath** | `/Student Records` | Library (URL segment; match actual URL). Often `/Module Submissions`. |
 | **SyncTable** | `/Documents/ActiveStudents.xlsx` | Excel with table `Enrollments`. |
 | **Enrollments** | Site connection reference | Pick your Grader/Backend site connection (e.g., Skills Center – Proctors) |
-| **SkillsCenter** | Site connection reference | Site-level CR if used. |
+| **SkillsCenter** | Site connection reference | Site level CR if used. |
 | **StudentSummary** | `StudentSummary` | List name bound via CR. |
 | **Grades** | `Grades` | List name bound via CR. |
 | **Modules** | `Modules` | List name bound via CR. |
@@ -475,7 +475,7 @@ Set these during solution import (or after, in Solution → Environment Variable
 ## Connection References
 Map these to connections in the target environment (prefer a service account):
 
-* **SharePoint** (site-level)
+* **SharePoint** (site level)
 * **Microsoft Teams**
 * **Microsoft Forms**
 * **Excel Online (Business)**
@@ -498,7 +498,7 @@ All flows/apps reference these CRs—no personal connections should remain in Pr
 7. Select **Import** and wait for completion.
 8. Review the import log. Do not continue to production testing if a required component failed to import.
 
-## Post-Import Configuration
+## Post Import Configuration
 
 ### Flows
 
@@ -531,7 +531,7 @@ All flows/apps reference these CRs—no personal connections should remain in Pr
 
 ## Smoke Tests
 
-Run these tests with fictional records in a non-production environment.
+Run these tests with fictional records in a nonproduction environment.
 
 1. **Identity isolation**
    - Sign in as Test Student A.
