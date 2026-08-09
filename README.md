@@ -23,7 +23,7 @@ The SkillsCenter solution tracks module submissions, grading, student summaries,
 
 ## Architecture
 * **Canvas Apps:** Student App, Proctor/Grader App
-* **Flows:** Grading, archive + certificate generation, student summary recalculation, enrollment sync, milestone logic, etc.
+* **Power Automate Flows:** Grading, archive + certificate generation, student summary recalculation, enrollment sync, milestone logic, etc.
 * **SharePoint:** Lists for configuration and data; libraries for files.
 * **Environment Variables:** Site URLs, list/library names, document paths.
 * **Connection References:** SharePoint, Teams, Forms, OneDrive, Excel.
@@ -33,13 +33,14 @@ The SkillsCenter solution tracks module submissions, grading, student summaries,
 * **Power Platform:** Environment access (Dev/Test/Prod).
 * **SharePoint:** Site Owner on the target Grader-Only site (e.g., *Skills Center – Proctors*).
     > **Critical:** This site must be restricted to Proctors/Staff. Students should not be members of this site.
+    > We recommend creating a Teams channel for the class. Then, creating a sub channel that has its own SharePoint site which should be restricted as outlined.
 
 ---
 
 ## SharePoint Provisioning
 
-### Security Architecture: Two-Site Model
-To maintain academic integrity and data security, we use a two-site structure:
+### Security Architecture: Two Site Model
+To maintain academic integrity and data security, we use a two site structure:
 
 1.  **Parent Site (Student Facing):** A general site accessible to all students. This may house the link to the App, static SOPs, or general announcements.
 2.  **Grader Site (Backend):** The "target site" for the lists/libraries below. Access must be restricted to Proctors/Graders only.
@@ -181,7 +182,7 @@ Set these during solution import (or after, in Solution → Environment Variable
 | **CertificatePath** | `/Certifications` | Library (URL segment) |
 | **StudentRecordPath** | `/Student Records` | Library (URL segment; match actual URL). Often `/Module Submissions`. |
 | **SyncTable** | `/Documents/ActiveStudents.xlsx` | Excel with table `Enrollments`. |
-| **Enrollments** | Site connection reference | Pick your Grader/Backend site connection (e.g., Skills Center – Proctors) |
+| **Enrollments** | Site connection reference | Pick your Grader/Backend site connection (e.g., Skills Center - Proctors) |
 | **SkillsCenter** | Site connection reference | Site-level CR if used. |
 | **StudentSummary** | `StudentSummary` | List name bound via CR. |
 | **Grades** | `Grades` | List name bound via CR. |
