@@ -61,7 +61,7 @@ The planning feature is local to the running app session. It helps a student exp
 
 ![Student App interface](images/student-app-overview.jpg)
 
-**Figure 1. Student App interface. Replace the image with a labeled screenshot of the student dashboard, module map, or submission view.**
+**Figure 1. Student App interface.**
 
 ### Proctor/Grader App
 
