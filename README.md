@@ -1,4 +1,4 @@
-# SkillsCenter LMS for Higher-Education Lab Courses
+# SkillsCenter LMS
 
 SkillsCenter LMS is a Power Apps and Power Automate solution for managing mastery-based work in higher-education laboratory courses. It tracks student enrollment, module submissions, grading, earned hours, feedback, milestones, and certificates.
 
